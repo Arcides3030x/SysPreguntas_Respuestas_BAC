@@ -1,0 +1,167 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model List<SysPreguntas_Respuestas_BAC.API.Models.Preguntas>
+<div class="container mx-auto p-4">
+
+    <div class="flex space-x-4 p-4 bg-gray-100 rounded-lg shadow-md">
+        <a asp-action="MisPreguntas"
+           asp-route-order="asc"
+           class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-200">
+            Más antigua a más reciente
+        </a>
+        <a asp-action="MisPreguntas"
+           asp-route-order="desc"
+           class="px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-200">
+            Más reciente a más antigua
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            @foreach (var pregunta in Model)
+            {
+
+                <!-- Modal Global (Fuera del bucle) -->
+                <div class="modal fade" id="confirmCerrarPreguntaModal" tabindex="-1" aria-labelledby="confirmCerrarPreguntaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmCerrarPreguntaModalLabel">¿Deseas cerrar esta pregunta?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Estás seguro de que deseas cerrar esta pregunta? Esta acción no se puede deshacer.
+                            </div>
+                            <div class="modal-footer">
+                                <form asp-action="Cerrar" asp-controller="Pregunta" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" id="modalIdPregunta" name="idPregunta" value="" />
+                                    <button type="submit" class="w-full mt-2 p-2.5 flex-1 text-white bg-red-600 rounded-md ring-offset-2 ring-red-600 focus:ring-2">
+                                        Cerrar Pregunta
+                                    </button>
+                                </form>
+                                <button aria-label="Close" type="button" class="w-full mt-2 p-2.5 flex-1 text-gray-800 rounded-md border ring-offset-2 ring-indigo-600 focus:ring-2"
+                                        data-bs-dismiss="modal">
+                                    Cancelar
+                                </button>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-blue-50 rounded-lg shadow-md overflow-hidden border border-blue-200">
+                    <div class="relative overflow-hidden">
+                        @if (pregunta.FotosPreguntas != null && pregunta.FotosPreguntas.Any())
+                        {
+                            <!-- Imagen principal -->
+                            <div class="relative">
+                                <img id="foto-@pregunta.IdPregunta"
+                                     src="@pregunta.FotosPreguntas.First().UrlFoto"
+                                     alt="Imagen de la pregunta"
+                                     class="w-full h-64 object-cover">
+                                <button onclick="cambiarFoto(-1, @pregunta.IdPregunta)"
+                                        class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded-l-md z-10">
+                                    &#10094;
+                                </button>
+                                <button onclick="cambiarFoto(1, @pregunta.IdPregunta)"
+                                        class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded-r-md z-10">
+                                    &#10095;
+                                </button>
+                            </div>
+                            <!-- Almacenar fotos en data-fotos -->
+                            <div class="hidden" onclick="redirigirAPregunta(@pregunta.IdPregunta)"
+                                 data-fotos='@Html.Raw(Json.Serialize(pregunta.FotosPreguntas.Select(f => f.UrlFoto)))'>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-4 text-center text-gray-500">
+                                No hay fotos disponibles para esta pregunta.
+                            </div>
+                        }
+                    </div>
+                    <div class="p-4">
+                        <h2 class="text-xl font-semibold text-blue-800 mb-1">@pregunta.Titulo</h2>
+                        <p class="text-gray-700 text-sm mb-4">@pregunta.Contenido</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <img class="w-8 h-8 rounded-full"
+                                     src="@((pregunta.IdUsuarioNavigation?.UrlFoto) ?? "https://flowbite.com/docs/images/people/profile-picture-5.jpg")"
+                                     alt="User image">
+
+                                <span class="text-sm text-gray-700 ml-2">@pregunta.IdUsuarioNavigation?.Usuario</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock text-blue-500 mr-2"></i>
+                                <span class="text-sm text-gray-600">@pregunta.FechaCreacion?.ToString("dd MMM yyyy")</span>
+                            </div>
+                        </div>
+
+                        <form asp-action="Index" asp-controller="Pregunta" method="post" class="mt-4">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@pregunta.IdPregunta" />
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-full font-semibold hover:bg-blue-600 transition-colors duration-200 mt-2">
+                                Responder
+                            </button>
+                        </form>
+                        @if (pregunta.EstaCerrada == false)
+                        {
+                            <form class="mt-4">
+                                <button type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#confirmCerrarPreguntaModal"
+                                        onclick="prepararCerrarPregunta(@pregunta.IdPregunta)"
+                                        class="w-full bg-red-500 text-white py-2 px-4 rounded-full font-semibold hover:bg-red-600 transition-colors duration-200 mt-2">
+                                    Cerrar Pregunta
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <p class="text-red-600 text-sm font-semibold mt-2">La pregunta ya está cerrada</p>
+                        }
+
+                    </div>
+                </div>
+               
+
+                <script>
+                    document.getElementById("cerrarPreguntaButton").addEventListener("click", function () {
+                        var preguntaId = "@pregunta.IdPregunta";  // Obtener la ID de la pregunta
+                        var form = document.createElement('form');
+                        form.method = 'post';
+                        form.action = '@Url.Action("Cerrar", "Pregunta")'; 
+
+                        var input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'idPregunta';  // Nombre del parámetro que el controlador espera
+                        input.value = preguntaId;  // Asignar el valor de la ID de la pregunta
+
+                        form.appendChild(input);
+                        document.body.appendChild(form);
+                        form.submit();  // Enviar el formulario
+                    });
+                </script>
+
+                <script>
+                    function prepararCerrarPregunta(idPregunta) {
+                        // Asignar el ID de la pregunta al campo oculto en el modal
+                        document.getElementById('modalIdPregunta').value = idPregunta;
+                        console.log('ID de la Pregunta seleccionada:', idPregunta); // Validación en consola
+                    }
+                </script>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center text-gray-500">
+            No hay Preguntas disponibles.
+        </div>
+    }
+</div>

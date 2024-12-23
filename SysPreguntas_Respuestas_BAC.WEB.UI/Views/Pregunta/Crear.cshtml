@@ -1,0 +1,38 @@
+﻿@model SysPreguntas_Respuestas_BAC.API.Models.Preguntas
+
+@{
+    ViewData["Title"] = "Crear Pregunta";
+}
+
+<div class="row">
+    <section class="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md">
+        <div class="text-center">
+            <h2 class="text-lg font-semibold text-gray-700 capitalize">Crear Pregunta</h2>
+        </div>
+        <form asp-action="Crear" method="post" enctype="multipart/form-data">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label class="text-gray-700" for="Titulo">Título</label>
+                    <input asp-for="Titulo" required="required" class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none focus:ring" name="Titulo">
+                </div>
+                <div>
+                    <label class="text-gray-700" for="Contenido">Contenido</label>
+                    <textarea asp-for="Contenido" required="required" class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none focus:ring" name="Contenido"></textarea>
+                </div>
+                <div>
+                    <label class="text-gray-700" for="imagen">Imagenes</label>
+                    <input required="required" type="file" class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none focus:ring" name="imagenFile" multiple>
+                </div>
+
+
+
+            </div>
+
+            <div class="flex justify-center mt-6">
+                <button type="submit" class="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-blue-700 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Guardar</button>
+                <a asp-controller="Home" asp-action="Index" class="ml-6 px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">Cancelar</a>
+
+            </div>
+        </form>
+    </section>
+</div>

@@ -1,0 +1,226 @@
+﻿@model List<SysPreguntas_Respuestas_BAC.API.Models.Respuestas>
+@{
+    ViewData["Title"] = "Respuestas a la Pregunta";
+    var pregunta = ViewBag.Pregunta as SysPreguntas_Respuestas_BAC.API.Models.Preguntas;
+    var userIdClaim = User.FindFirst("UserId")?.Value;
+    int? currentUserId = string.IsNullOrEmpty(userIdClaim) ? (int?)null : int.Parse(userIdClaim);
+    bool preguntaCerrada = pregunta?.EstaCerrada ?? false;
+}
+
+<div class="flex-1 p-4 sm:p-6 flex flex-col h-screen mt-[-50px]">
+    @if (pregunta?.FotosPreguntas != null && pregunta.FotosPreguntas.Any())
+    {
+        <!-- Galería de Imágenes -->
+        <div id="gallery" class="relative w-full mt-4" data-carousel="static">
+            <!-- Contenedor Principal del Carrusel -->
+            <div class="relative h-64 md:h-96 overflow-hidden rounded-lg">
+                @foreach (var foto in pregunta.FotosPreguntas)
+                {
+                    <div class="hidden duration-700 ease-in-out" data-carousel-item>
+                        <img src="@foto.UrlFoto"
+                             class="absolute block w-full h-full object-cover"
+                             alt="Imagen de la pregunta">
+                    </div>
+                }
+            </div>
+
+            <!-- Botón Anterior -->
+            <button type="button"
+                    class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+                    data-carousel-prev>
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-800/60">
+                    <svg class="w-5 h-5 text-gray-800 dark:text-white"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10" fill="none">
+                        <path d="M5 1 1 5l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="sr-only">Anterior</span>
+                </span>
+            </button>
+
+            <!-- Botón Siguiente -->
+            <button type="button"
+                    class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+                    data-carousel-next>
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-800/60">
+                    <svg class="w-5 h-5 text-gray-800 dark:text-white"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10" fill="none">
+                        <path d="m1 9 4-4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="sr-only">Siguiente</span>
+                </span>
+            </button>
+        </div>
+
+        <!-- Información de la Pregunta -->
+        <div class="mt-6 border-t border-gray-200 pt-4">
+            <div class="flex flex-col space-y-2">
+                <h2 class="text-xl font-semibold text-gray-800">Pregunta de @pregunta?.IdUsuarioNavigation.Usuario</h2>
+                <h3 class="text-lg font-medium text-gray-700">@pregunta?.Titulo</h3>
+                <p class="text-base text-gray-600">@pregunta?.Contenido</p>
+                <p class="text-sm text-gray-500">@pregunta?.FechaCreacion</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center mt-6">
+            <p class="text-gray-500 text-base">No hay fotos disponibles para esta pregunta.</p>
+        </div>
+    }
+</div>
+
+<div class="flex-1 p-2 sm:p-6 justify-between flex flex-col h-screen mt-[-0px]">
+    <!-- Contenedor de Mensajes -->
+    <div id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var respuesta in Model)
+            {
+                @if (respuesta.IdUsuario == currentUserId)
+                {
+                    <!-- Respuesta del Usuario Actual -->
+                    <div class="chat-message">
+                        @if (respuesta.IdRespuestaPadre != null)
+                        {
+                            <div class="flex items-end justify-end mb-1">
+                                <div class="text-sm text-gray-500 text-right">
+                                    <strong>En respuesta a: </strong>
+                                    <span class="font-bold text-blue-600">@respuesta.IdRespuestaPadreNavigation?.IdUsuarioNavigation?.Nombre:</span>
+                                    <span>"@respuesta.IdRespuestaPadreNavigation?.Contenido"</span>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="flex items-end justify-end">
+                            <div class="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
+                                <div class="text-gray-500 text-sm font-bold">Yo</div>
+                                <span class="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white">@respuesta.Contenido</span>
+                                <div class="text-gray-400 text-xs">@respuesta.FechaCreacion?.ToString("dd MMM yyyy")</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- Respuesta de Otros Usuarios -->
+                    <div class="chat-message">
+                        @if (respuesta.IdRespuestaPadre != null && respuesta.IdRespuestaPadreNavigation?.IdUsuario == currentUserId)
+                        {
+                            <!-- Respuesta de Otro Usuario a una Respuesta del Usuario Actual -->
+                            <div class="flex items-start mb-1">
+                                <div class="text-sm text-gray-500">
+                                    <strong>En respuesta a: </strong>
+                                    <span class="font-bold text-blue-600">Yo:</span>
+                                    <span>"@respuesta.IdRespuestaPadreNavigation?.Contenido"</span>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="flex items-start">
+                            <div class="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
+                                <div class="text-gray-500 text-sm font-bold">@respuesta.IdUsuarioNavigation?.Nombre</div>
+                                <span class="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">@respuesta.Contenido</span>
+                                <div class="text-gray-400 text-xs">@respuesta.FechaCreacion?.ToString("dd MMM yyyy")</div>
+                            </div>
+                            @if (respuesta.IdUsuario != currentUserId)
+                            {
+                                <button onclick="responderAUsuario(@respuesta.IdRespuesta, '@respuesta.Contenido')"
+                                        class="text-blue-600 text-xs underline">
+                                    Responder
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+
+    <!-- Área para Mostrar Respuesta Seleccionada -->
+    <div id="respuestaSeleccionada" class="hidden border-l-4 border-blue-500 bg-blue-100 p-3 rounded-md mb-2">
+        <div class="flex justify-between items-center">
+            <div>
+                <strong>Respondiendo a:</strong>
+                <p id="contenidoRespuestaSeleccionada" class="text-gray-700 text-sm"></p>
+            </div>
+            <button onclick="cancelarRespuesta()" class="text-red-500 text-sm font-bold">Cancelar</button>
+        </div>
+    </div>
+    @if (!preguntaCerrada)
+    {
+        <form asp-action="Responder" asp-controller="Pregunta" method="post" class="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@ViewBag.IdPregunta" />
+            <input type="hidden" id="idRespuestaPadre" name="idRespuestaPadre" value="" />
+
+            <div class="relative flex">
+                <input type="text" name="contenido" id="contenido" placeholder="Escribe una respuesta..." required class="w-full focus:outline-none text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-md py-3">
+                <div class="absolute right-0 items-center inset-y-0 sm:flex">
+                    <button type="submit" class="inline-flex items-center rounded-lg px-4 py-3 bg-blue-500 text-white hover:bg-blue-400">
+                        <span class="font-bold">Enviar</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    }
+    else
+    {
+        <p class="text-gray-500 text-center mt-4">La pregunta ya está cerrada, no se pueden agregar más respuestas.</p>
+    }
+
+</div>
+
+<script>
+    function responderAUsuario(idRespuestaPadre, contenido) {
+        document.getElementById('idRespuestaPadre').value = idRespuestaPadre;
+        document.getElementById('contenidoRespuestaSeleccionada').innerText = contenido;
+        document.getElementById('respuestaSeleccionada').classList.remove('hidden');
+        document.getElementById('contenido').focus();
+    }
+
+    function cancelarRespuesta() {
+        document.getElementById('idRespuestaPadre').value = '';
+        document.getElementById('contenidoRespuestaSeleccionada').innerText = '';
+        document.getElementById('respuestaSeleccionada').classList.add('hidden');
+    }
+
+    // Validar formulario antes de enviar
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const contenido = document.getElementById('contenido').value.trim();
+        if (!contenido) {
+            e.preventDefault();
+            alert('El contenido de la respuesta no puede estar vacío.');
+        }
+    });
+
+</script>
+
+
+<style>
+    .scrollbar-w-2::-webkit-scrollbar {
+        width: 0.25rem;
+    }
+
+    .scrollbar-track-blue-lighter::-webkit-scrollbar-track {
+        background-color: #f7fafc;
+    }
+
+    .scrollbar-thumb-blue::-webkit-scrollbar-thumb {
+        background-color: #edf2f7;
+    }
+
+    .scrollbar-thumb-rounded::-webkit-scrollbar-thumb {
+        border-radius: 0.25rem;
+    }
+
+    .chat-message .items-end {
+        align-self: flex-end;
+        text-align: right;
+    }
+
+    .chat-message .items-start {
+        align-self: flex-start;
+        text-align: left;
+    }
+
+</style>

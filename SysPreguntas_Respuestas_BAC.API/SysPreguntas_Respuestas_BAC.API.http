@@ -1,0 +1,6 @@
+@SysPreguntas_Respuestas_BAC.API_HostAddress = http://localhost:5252
+
+GET {{SysPreguntas_Respuestas_BAC.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

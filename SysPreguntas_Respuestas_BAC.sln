@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SysPreguntas_Respuestas_BAC.API", "SysPreguntas_Respuestas_BAC.API\SysPreguntas_Respuestas_BAC.API.csproj", "{0779B393-EC9E-47C0-98FF-87EB66A14BA2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SysPreguntas_Respuestas_BAC.WEB.UI", "SysPreguntas_Respuestas_BAC.WEB.UI\SysPreguntas_Respuestas_BAC.WEB.UI.csproj", "{C92CCE47-FF70-42C7-9C0A-1C67B1DFA905}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0779B393-EC9E-47C0-98FF-87EB66A14BA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0779B393-EC9E-47C0-98FF-87EB66A14BA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0779B393-EC9E-47C0-98FF-87EB66A14BA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0779B393-EC9E-47C0-98FF-87EB66A14BA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C92CCE47-FF70-42C7-9C0A-1C67B1DFA905}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C92CCE47-FF70-42C7-9C0A-1C67B1DFA905}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C92CCE47-FF70-42C7-9C0A-1C67B1DFA905}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C92CCE47-FF70-42C7-9C0A-1C67B1DFA905}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {747AABF1-9C66-4E56-96E4-8D4B98C04FAA}
+	EndGlobalSection
+EndGlobal
